@@ -1,138 +1,871 @@
-<!doctype html>
-
+<!DOCTYPE html>
 <html lang="en">
-   
-   
-    <head>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>sheva.me — Coming Soon</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Syne+Mono&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0c0c0c;
+  --fg: #efefef;
+  --muted: #505050;
+  --accent: #d4b896;
+  --border: rgba(239,239,239,0.07);
+}
 
+* { margin:0; padding:0; box-sizing:border-box; }
+html { height:100%; }
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: 'Syne', sans-serif;
+  min-height: 100%;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  overflow: hidden;
+}
 
-        <!-- META -->
-        <meta charset="utf-8">
-        <meta name="robots" content="noodp">
-        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+/* ── INITIAL LOADER (full screen on first visit) ── */
+#init-loader {
+  position: fixed;
+  inset: 0;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 22px;
+  z-index: 200;
+  transition: transform 0.65s cubic-bezier(0.77,0,0.175,1);
+}
 
-        <!-- PAGE TITLE -->
-        <title>HSY - Coming Soon</title>
+#init-loader.slide-away {
+  transform: translateY(-100%);
+}
 
-        <!-- FAVICON -->
-        <link rel="shortcut icon" href="assets/img/logo.png">
+/* ── START LOADER (slides in from top on button press) ── */
+#start-loader {
+  position: fixed;
+  inset: 0;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 22px;
+  z-index: 100;
+  transform: translateY(-100%);
+  transition: transform 0.55s cubic-bezier(0.77,0,0.175,1);
+}
 
-        <!-- FONTS -->
-        <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700&amp;subset=latin-ext" rel="stylesheet">
+#start-loader.slide-in  { transform: translateY(0); }
+#start-loader.slide-out { transform: translateY(100%); transition: transform 0.6s cubic-bezier(0.77,0,0.175,1); }
 
-        <!-- STYLESHEETS -->
-        <link rel="stylesheet" type="text/css" href="assets/css/plugins.css">
-        <link rel="stylesheet" type="text/css" href="assets/css/main.css">
+/* Shared loader content */
+.rocket {
+  font-size: 3rem;
+  animation: wobble 0.4s ease-in-out infinite alternate;
+  filter: drop-shadow(0 0 20px rgba(212,184,150,0.4));
+  line-height: 1;
+}
 
+@keyframes wobble {
+  0%   { transform: rotate(-13deg) translateY(0); }
+  100% { transform: rotate(13deg)  translateY(-9px); }
+}
 
-    </head>
+.loader-site {
+  font-family: 'Syne Mono', monospace;
+  font-size: 0.82rem;
+  color: var(--accent);
+  letter-spacing: 0.05em;
+}
 
+.loader-label {
+  font-family: 'Syne Mono', monospace;
+  font-size: 0.57rem;
+  font-weight: 400;
+  letter-spacing: 0.28em;
+  color: var(--muted);
+  text-transform: uppercase;
+}
 
-    <body>
-    
-       
-        <!-- PRELOADER -->
-        <div class="preloader">
-           
-            <!-- SPINNER -->
-            <div class="spinner">
-             
-              <div class="bounce-1"></div>
-              <div class="bounce-2"></div>
-              <div class="bounce-3"></div>
-              
-            </div>
-            <!-- /SPINNER -->
-            
+.loader-bar {
+  width: 130px;
+  height: 1px;
+  background: rgba(239,239,239,0.08);
+  position: relative;
+  overflow: hidden;
+}
+
+.loader-fill {
+  position: absolute;
+  left:0; top:0; bottom:0;
+  width: 0%;
+  background: var(--accent);
+  transition: width 0.1s linear;
+}
+
+/* ── NAV ── */
+nav {
+  width: 100%;
+  padding: 28px 44px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+}
+
+.brand {
+  font-family: 'Syne Mono', monospace;
+  font-size: 0.88rem;
+  color: var(--accent);
+  text-decoration: none;
+  letter-spacing: 0.05em;
+}
+
+/* ── HERO ── */
+#hero {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 32px;
+  padding: 20px 32px;
+  position: relative;
+  z-index: 1;
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+#hero.hide {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-14px);
+  position: absolute;
+}
+
+.hero-tag {
+  font-family: 'Syne Mono', monospace;
+  font-size: 0.58rem;
+  letter-spacing: 0.32em;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+
+.hero-title {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(3rem, 8.5vw, 6.2rem);
+  font-weight: 800;
+  line-height: 1.02;
+  letter-spacing: -0.03em;
+  color: var(--fg);
+}
+
+.hero-title span {
+  display: block;
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.hero-sub {
+  font-family: 'Syne Mono', monospace;
+  font-size: 0.64rem;
+  letter-spacing: 0.14em;
+  color: var(--muted);
+}
+
+.btn-start {
+  background: var(--fg);
+  color: var(--bg);
+  font-family: 'Syne', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  padding: 15px 42px;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.15s;
+}
+
+.btn-start:hover { background: var(--accent); transform: translateY(-2px); }
+.btn-start:active { transform: translateY(0); }
+
+/* ── GAME AREA ── */
+#game-area {
+  flex: 1;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 12px 16px 0;
+  gap: 12px;
+  width: 100%;
+  position: relative;
+  z-index: 1;
+  opacity: 0;
+  overflow-y: auto;
+  transition: opacity 0.5s ease;
+}
+
+#game-area.show    { display: flex; }
+#game-area.fade-in { opacity: 1; }
+
+/* HUD */
+.hud {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 36px;
+  flex-shrink: 0;
+}
+
+.hud-item { text-align: center; }
+
+.hud-label {
+  font-family: 'Syne Mono', monospace;
+  font-size: 0.5rem;
+  letter-spacing: 0.26em;
+  color: var(--muted);
+  text-transform: uppercase;
+  margin-bottom: 2px;
+}
+
+.hud-val {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.55rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--fg);
+  line-height: 1;
+}
+
+/* Layout */
+.game-layout {
+  display: flex;
+  gap: 18px;
+  align-items: flex-start;
+  flex-shrink: 0;
+}
+
+.board-wrap { position: relative; flex-shrink: 0; }
+
+canvas#board {
+  display: block;
+  border: 1px solid var(--border);
+}
+
+/* Game over overlay */
+.board-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(12,12,12,0.92);
+  gap: 10px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.35s;
+}
+
+.board-overlay.show { opacity:1; pointer-events:all; }
+
+.ov-label {
+  font-family: 'Syne Mono', monospace;
+  font-size: 0.52rem;
+  letter-spacing: 0.3em;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+
+.ov-score {
+  font-family: 'Syne', sans-serif;
+  font-size: 3.2rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--accent);
+  line-height: 1;
+}
+
+.ov-btn {
+  margin-top: 8px;
+  background: transparent;
+  border: 1px solid rgba(239,239,239,0.25);
+  color: var(--fg);
+  font-family: 'Syne', sans-serif;
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  padding: 11px 28px;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.ov-btn:hover { background: rgba(239,239,239,0.07); border-color: var(--fg); }
+
+/* Pause */
+.pause-text {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(12,12,12,0.72);
+  font-family: 'Syne', sans-serif;
+  font-size: 1.3rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  color: var(--fg);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+
+.pause-text.show { opacity:1; }
+
+/* Side panel — desktop only */
+.side {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.side-box {
+  border: 1px solid var(--border);
+  padding: 12px 14px;
+}
+
+.side-label {
+  font-family: 'Syne Mono', monospace;
+  font-size: 0.48rem;
+  letter-spacing: 0.24em;
+  color: var(--muted);
+  text-transform: uppercase;
+  margin-bottom: 9px;
+}
+
+canvas#nextPiece { display: block; }
+
+.side-key {
+  font-family: 'Syne Mono', monospace;
+  font-size: 0.5rem;
+  color: var(--muted);
+  line-height: 2;
+}
+
+.side-key b { color: rgba(239,239,239,0.55); font-weight: 400; }
+
+/* ── MOBILE CONTROLS ── */
+.mobile-controls {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  flex-shrink: 0;
+  padding-bottom: 16px;
+  width: 100%;
+}
+
+.mc-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+}
+
+.mc-btn {
+  background: rgba(239,239,239,0.04);
+  border: 1px solid var(--border);
+  color: var(--fg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  touch-action: manipulation;
+  transition: background 0.08s;
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.mc-btn:active, .mc-btn.pressed {
+  background: rgba(212,184,150,0.14);
+}
+
+/* Square buttons */
+.mc-sq {
+  width: 64px;
+  height: 64px;
+  font-size: 1.3rem;
+}
+
+/* Drop button */
+.mc-drop {
+  width: 192px;
+  height: 52px;
+  font-size: 0.62rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+/* FOOTER */
+footer {
+  width: 100%;
+  padding: 16px 44px;
+  text-align: center;
+  flex-shrink: 0;
+  border-top: 1px solid var(--border);
+  position: relative;
+  z-index: 1;
+}
+
+.footer-copy {
+  font-family: 'Syne Mono', monospace;
+  font-size: 0.54rem;
+  color: var(--muted);
+  letter-spacing: 0.14em;
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 640px) {
+  nav  { padding: 18px 20px; }
+  footer { padding: 12px 20px; }
+  #hero { gap: 24px; padding: 16px 20px; }
+  .hero-title { letter-spacing: -0.02em; }
+  .hud { gap: 16px; }
+  .hud-val { font-size: 1.25rem; }
+  .side { display: none; }
+  .mobile-controls { display: flex; }
+  #game-area { padding: 10px 16px 0; gap: 10px; justify-content: flex-start; }
+}
+</style>
+</head>
+<body>
+
+<!-- ── INITIAL LOADER ── -->
+<div id="init-loader">
+  <div class="loader-site">sheva.me</div>
+  <div class="rocket">🚀</div>
+  <div class="loader-label">Loading...</div>
+  <div class="loader-bar"><div class="loader-fill" id="initFill"></div></div>
+</div>
+
+<!-- ── START LOADER ── -->
+<div id="start-loader">
+  <div class="loader-site">sheva.me</div>
+  <div class="rocket">🚀</div>
+  <div class="loader-label">Launching game...</div>
+  <div class="loader-bar"><div class="loader-fill" id="startFill"></div></div>
+</div>
+
+<!-- ── NAV ── -->
+<nav>
+  <a class="brand" href="/">sheva.me</a>
+</nav>
+
+<!-- ── HERO ── -->
+<section id="hero">
+  <div class="hero-tag">coming soon</div>
+  <div class="hero-title">
+    This site is<br>
+    <span>under construction.</span>
+  </div>
+  <div class="hero-sub">Play a minigame while you wait.</div>
+  <button class="btn-start" onclick="triggerStart()">Start →</button>
+</section>
+
+<!-- ── GAME ── -->
+<section id="game-area">
+  <div class="hud">
+    <div class="hud-item"><div class="hud-label">Score</div><div class="hud-val" id="scoreEl">0</div></div>
+    <div class="hud-item"><div class="hud-label">Level</div><div class="hud-val" id="levelEl">1</div></div>
+    <div class="hud-item"><div class="hud-label">Lines</div><div class="hud-val" id="linesEl">0</div></div>
+    <div class="hud-item"><div class="hud-label">Best</div><div class="hud-val"  id="bestEl">0</div></div>
+  </div>
+
+  <div class="game-layout">
+    <div class="board-wrap">
+      <canvas id="board"></canvas>
+      <div class="board-overlay" id="gameOver">
+        <div class="ov-label">Game Over</div>
+        <div class="ov-score" id="ovScore">0</div>
+        <button class="ov-btn" onclick="initGame()">Retry →</button>
+      </div>
+      <div class="pause-text" id="pauseText">PAUSED</div>
+    </div>
+    <div class="side">
+      <div class="side-box">
+        <div class="side-label">Next</div>
+        <canvas id="nextPiece"></canvas>
+      </div>
+      <div class="side-box">
+        <div class="side-label">Keys</div>
+        <div class="side-key">
+          <b>← →</b> Move<br>
+          <b>↑</b> Rotate<br>
+          <b>↓</b> Soft drop<br>
+          <b>Space</b> Hard drop<br>
+          <b>P</b> Pause
         </div>
-        <!-- /PRELOADER -->
+      </div>
+    </div>
+  </div>
 
+  <!-- MOBILE CONTROLS -->
+  <div class="mobile-controls" id="mobileCtrl">
+    <div class="mc-row">
+      <div class="mc-btn mc-sq" id="mcRot">↻</div>
+    </div>
+    <div class="mc-row">
+      <div class="mc-btn mc-sq" id="mcL">←</div>
+      <div class="mc-btn mc-sq" id="mcD">↓</div>
+      <div class="mc-btn mc-sq" id="mcR">→</div>
+    </div>
+    <div class="mc-row" style="margin-top:8px">
+      <div class="mc-btn mc-drop" id="mcDrop">DROP</div>
+    </div>
+  </div>
+</section>
 
-        <!-- HERO -->
-        <div class="hero">
+<footer>
+  <div class="footer-copy">© <span id="yr"></span> HSY. All rights reserved.</div>
+</footer>
 
+<script>
+document.getElementById('yr').textContent = new Date().getFullYear();
 
-            <!-- FRONT CONTENT -->
-            <div class="front-content">
+// ── LOADER UTILS ──────────────────────────────────────────────────
+function runProgressBar(fillEl, duration, onDone) {
+  let pct = 0;
+  const step = () => {
+    pct += Math.random() * 14 + 5;
+    if (pct >= 100) {
+      fillEl.style.width = '100%';
+      setTimeout(onDone, 120);
+      return;
+    }
+    fillEl.style.width = pct + '%';
+    setTimeout(step, duration / 14);
+  };
+  step();
+}
 
+// ── INITIAL LOAD (page open) ──────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  const loader = document.getElementById('init-loader');
+  const fill   = document.getElementById('initFill');
+  runProgressBar(fill, 1200, () => {
+    loader.classList.add('slide-away');
+    loader.addEventListener('transitionend', () => {
+      loader.style.display = 'none';
+    }, { once: true });
+  });
+});
 
-                <!-- CONTAINER MID -->
-                <div class="container-mid">
+// ── START BUTTON ──────────────────────────────────────────────────
+function triggerStart() {
+  const sl   = document.getElementById('start-loader');
+  const fill = document.getElementById('startFill');
+  document.getElementById('hero').classList.add('hide');
+  sl.classList.add('slide-in');
+  runProgressBar(fill, 1300, () => {
+    document.getElementById('game-area').classList.add('show');
+    sl.classList.add('slide-out');
+    sl.addEventListener('transitionend', () => {
+      sl.style.display = 'none';
+      requestAnimationFrame(() => {
+        document.getElementById('game-area').classList.add('fade-in');
+      });
+      initGame();
+    }, { once: true });
+  });
+}
 
+// ── TETRIS ──────────────────────────────────────────────────────
+const COLS = 10, ROWS = 20;
 
-                    <!-- ANIMATION CONTAINER -->
-                    <div class="animation-container animation-fade-down" data-animation-delay="0">
-                       
-                        <img class="img-responsive logo" src="assets/img/logo.png" alt="image">
-                        
-                    </div>
-                    <!-- /ANIMATION CONTAINER -->
-                    
-                    
-                    <!-- ANIMATION CONTAINER -->
-                    <div class="animation-container animation-fade-right" data-animation-delay="300">
-                        
-                        <h2>Coming Soon..</h2>
-                        
-                    </div>
-                    <!-- /ANIMATION CONTAINER -->
-                    
-                    
-                    <!-- ANIMATION CONTAINER -->
-                    <div class="animation-container animation-fade-left" data-animation-delay="600"> 
-                       
-                        <p class="subline">Site is under construction process.</p>
-                        
-                    </div>
-                    <!-- /ANIMATION CONTAINER -->
-                    
+// Cell size: fill screen on mobile while keeping board visible
+function calcCell() {
+  if (window.innerWidth > 640) return 28;
+  // Available height for board: screen height minus nav(~56) HUD(~52) controls(~196) footer(~44) gaps(~40)
+  const availH = window.innerHeight - 56 - 52 - 196 - 44 - 40;
+  const byH = Math.floor(availH / ROWS);
+  // Available width: screen width minus padding
+  const byW = Math.floor((window.innerWidth - 32) / COLS);
+  return Math.max(22, Math.min(byH, byW, 30));
+}
 
-                </div>
-                <!-- /CONTAINER MID -->
+const CELL = calcCell();
 
+const COLORS = {
+  I:'#5b9bd5', O:'#d4aa47', T:'#a45b9b',
+  S:'#4caf7d', Z:'#d45b4c', J:'#5b6fba', L:'#d47a4c'
+};
+const SHAPES = {
+  I:[[0,0,0,0],[1,1,1,1],[0,0,0,0],[0,0,0,0]],
+  O:[[1,1],[1,1]],
+  T:[[0,1,0],[1,1,1],[0,0,0]],
+  S:[[0,1,1],[1,1,0],[0,0,0]],
+  Z:[[1,1,0],[0,1,1],[0,0,0]],
+  J:[[1,0,0],[1,1,1],[0,0,0]],
+  L:[[0,0,1],[1,1,1],[0,0,0]],
+};
+const SCORE_TBL = [0,100,300,500,800];
 
-                <!-- FOOTER -->
-                <div class="footer">
-                    
+const board  = document.getElementById('board');
+const ctx    = board.getContext('2d');
+board.width  = COLS * CELL;
+board.height = ROWS * CELL;
 
-                    <!-- ANIMATION CONTAINER -->
-                    <div class="animation-container animation-fade-up" data-animation-delay="900">
-                       
-                        <p>© 2025 <a href="https://github.com/shevayanuar">HSY.</a></p>
-                        
-                    </div>
-                    <!-- /ANIMATION CONTAINER -->
-                    
+const NC   = document.getElementById('nextPiece');
+const nctx = NC.getContext('2d');
+const NS   = Math.round(CELL * 0.72);
+NC.width = 4*NS; NC.height = 4*NS;
 
-                </div>
-                <!-- /FOOTER -->
+let grid, piece, next, score, best, level, lines, gState, dropTimer, dropInterval, animId;
+best = parseInt(localStorage.getItem('sheva_tb')||'0');
+document.getElementById('bestEl').textContent = best;
 
+const KEYS    = {};
+const newGrid = () => Array.from({length:ROWS}, ()=>Array(COLS).fill(null));
+const types   = Object.keys(SHAPES);
+const randPc  = () => {
+  const k = types[Math.floor(Math.random()*types.length)];
+  return { matrix: SHAPES[k].map(r=>[...r]), color: COLORS[k],
+           x: Math.floor(COLS/2) - Math.floor(SHAPES[k][0].length/2), y: 0 };
+};
+const rot90 = m => m[0].map((_,c) => m.map((_,r) => m[m.length-1-r][c]));
 
-            </div>
-            <!-- /FRONT CONTENT -->
+function valid(p, dx=0, dy=0, mat=null) {
+  const m = mat||p.matrix;
+  for (let r=0;r<m.length;r++) for (let c=0;c<m[r].length;c++) {
+    if (!m[r][c]) continue;
+    const nx=p.x+c+dx, ny=p.y+r+dy;
+    if (nx<0||nx>=COLS||ny>=ROWS) return false;
+    if (ny>=0 && grid[ny][nx]) return false;
+  }
+  return true;
+}
 
+function lock() {
+  piece.matrix.forEach((row,r)=>row.forEach((v,c)=>{
+    if (v && piece.y+r>=0) grid[piece.y+r][piece.x+c]=piece.color;
+  }));
+}
 
-            <!-- BACKGROUND CONTENT -->
-            <div class="background-content parallax-on">
+function clearLines() {
+  let n=0;
+  for (let r=ROWS-1;r>=0;r--) {
+    if (grid[r].every(c=>c!==null)) { grid.splice(r,1); grid.unshift(Array(COLS).fill(null)); n++; r++; }
+  }
+  return n;
+}
 
-                <div class="background-overlay"></div>
-                <div class="background-img layer" data-depth="0.05"></div>
-                
-            </div>
-            <!-- /BACKGROUND CONTENT -->
+function ghostY() { let d=0; while(valid(piece,0,d+1)) d++; return piece.y+d; }
 
+function drawCell(col, x, y, a=1, actx=ctx, cell=CELL) {
+  if (!col) return;
+  actx.globalAlpha = a;
+  actx.fillStyle = col;
+  actx.fillRect(x*cell+1, y*cell+1, cell-2, cell-2);
+  actx.fillStyle = 'rgba(255,255,255,0.13)';
+  actx.fillRect(x*cell+2, y*cell+2, cell-4, 3);
+  actx.fillStyle = 'rgba(0,0,0,0.18)';
+  actx.fillRect(x*cell+1, y*cell+cell-3, cell-2, 2);
+  actx.globalAlpha = 1;
+}
 
-        </div>
-        <!-- /HERO -->
-        
+function drawBoard() {
+  ctx.fillStyle = '#090909';
+  ctx.fillRect(0,0,board.width,board.height);
+  ctx.strokeStyle = 'rgba(239,239,239,0.04)';
+  ctx.lineWidth = 0.5;
+  for (let r=0;r<ROWS;r++) for (let c=0;c<COLS;c++) ctx.strokeRect(c*CELL,r*CELL,CELL,CELL);
+  grid.forEach((row,r)=>row.forEach((col,c)=>{ if(col) drawCell(col,c,r); }));
+  if (piece && gState==='playing') {
+    const gy=ghostY();
+    piece.matrix.forEach((row,r)=>row.forEach((v,c)=>{ if(v) drawCell(piece.color,piece.x+c,gy+r,0.12); }));
+  }
+  if (piece) piece.matrix.forEach((row,r)=>row.forEach((v,c)=>{ if(v) drawCell(piece.color,piece.x+c,piece.y+r); }));
+}
 
-        <!-- JAVASCRIPTS -->
-        <script type="text/javascript" src="assets/js/plugins.js"></script>
-        <script type="text/javascript" src="assets/js/main.js"></script>
+function drawNext() {
+  nctx.fillStyle='#090909'; nctx.fillRect(0,0,NC.width,NC.height);
+  if (!next) return;
+  const m=next.matrix, ox=Math.floor((4-m[0].length)/2), oy=Math.floor((4-m.length)/2);
+  m.forEach((row,r)=>row.forEach((v,c)=>{ if(v) drawCell(next.color,ox+c,oy+r,1,nctx,NS); }));
+}
 
+function updateHUD() {
+  document.getElementById('scoreEl').textContent = score.toLocaleString();
+  document.getElementById('levelEl').textContent = level;
+  document.getElementById('linesEl').textContent = lines;
+  document.getElementById('bestEl').textContent  = best.toLocaleString();
+}
 
-    </body> 
-    
-    
+function spawnPiece() {
+  piece=next||randPc(); next=randPc(); drawNext();
+  if (!valid(piece)) {
+    gState='dead';
+    if (score>best) { best=score; localStorage.setItem('sheva_tb',best); }
+    updateHUD();
+    setTimeout(()=>{
+      document.getElementById('ovScore').textContent = score.toLocaleString();
+      document.getElementById('gameOver').classList.add('show');
+    }, 450);
+  }
+}
 
+function drop() {
+  if (!valid(piece,0,1)) {
+    lock();
+    const n=clearLines();
+    if (n) { score+=SCORE_TBL[n]*level; lines+=n; level=1+Math.floor(lines/10); dropInterval=calcInterval(); }
+    updateHUD(); spawnPiece();
+  } else piece.y++;
+}
+
+function hardDrop() { while(valid(piece,0,1)) piece.y++; drop(); }
+function moveLeft()  { if(valid(piece,-1)) piece.x--; }
+function moveRight() { if(valid(piece,1))  piece.x++; }
+function rotatePiece() {
+  const r=rot90(piece.matrix); let k=0;
+  if (!valid(piece,0,0,r)) { k=piece.x<COLS/2?1:-1; if(!valid(piece,k,0,r)) return; }
+  piece.matrix=r; piece.x+=k;
+}
+
+const calcInterval = () => Math.max(80, 800-(level-1)*70);
+
+let lastTs=0;
+function loop(ts) {
+  if (gState!=='playing') return;
+  const dt=ts-lastTs; lastTs=ts;
+  dropTimer+=dt;
+  if (KEYS['ArrowDown']||KEYS['s']) dropTimer+=dt*9;
+  if (dropTimer>=dropInterval) { dropTimer=0; drop(); }
+  drawBoard();
+  animId=requestAnimationFrame(loop);
+}
+
+// Key hold for smooth movement
+let lHold=null, rHold=null;
+const clearHold = side => {
+  const h=side==='l'?lHold:rHold;
+  if (h) { clearTimeout(h.t); clearInterval(h.i); }
+  if (side==='l') lHold=null; else rHold=null;
+};
+
+document.addEventListener('keydown', e=>{
+  if([' ','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.key)) e.preventDefault();
+  if (KEYS[e.key]) return;
+  KEYS[e.key]=true;
+  if (gState==='playing') {
+    if (e.key==='ArrowLeft'||e.key==='a')  { moveLeft();  lHold={t:setTimeout(()=>{lHold.i=setInterval(moveLeft,55);},165)}; }
+    if (e.key==='ArrowRight'||e.key==='d') { moveRight(); rHold={t:setTimeout(()=>{rHold.i=setInterval(moveRight,55);},165)}; }
+    if (e.key==='ArrowUp'||e.key==='x') rotatePiece();
+    if (e.key===' ') hardDrop();
+  }
+  if (e.key==='p'||e.key==='P') togglePause();
+});
+
+document.addEventListener('keyup', e=>{
+  KEYS[e.key]=false;
+  if (e.key==='ArrowLeft'||e.key==='a')  clearHold('l');
+  if (e.key==='ArrowRight'||e.key==='d') clearHold('r');
+});
+
+function togglePause() {
+  if (gState==='playing') {
+    gState='paused'; cancelAnimationFrame(animId);
+    document.getElementById('pauseText').classList.add('show');
+  } else if (gState==='paused') {
+    gState='playing'; document.getElementById('pauseText').classList.remove('show');
+    lastTs=performance.now(); dropTimer=0; animId=requestAnimationFrame(loop);
+  }
+}
+
+function initGame() {
+  cancelAnimationFrame(animId);
+  grid=newGrid(); score=0; level=1; lines=0; piece=null;
+  next=randPc(); spawnPiece(); updateHUD();
+  dropInterval=calcInterval(); dropTimer=0;
+  document.getElementById('gameOver').classList.remove('show');
+  document.getElementById('pauseText').classList.remove('show');
+  gState='playing'; lastTs=performance.now();
+  animId=requestAnimationFrame(loop);
+}
+
+// ── MOBILE CONTROLS ──────────────────────────────────────────────
+// Tap actions
+const MC_ACTIONS = {
+  mcRot:  () => { if(gState==='playing') { rotatePiece(); drawBoard(); } },
+  mcL:    () => { if(gState==='playing') { moveLeft();    drawBoard(); } },
+  mcR:    () => { if(gState==='playing') { moveRight();   drawBoard(); } },
+  mcD:    () => { if(gState==='playing') { dropTimer += dropInterval * 0.65; } },
+  mcDrop: () => { if(gState==='playing') { hardDrop();    drawBoard(); } },
+};
+
+// For left/right: hold repeat
+let mcLInterval=null, mcRInterval=null;
+
+function bindMcBtn(id, act, holdRepeat=false) {
+  const el = document.getElementById(id);
+  if (!el) return;
+
+  const press = () => { act(); el.classList.add('pressed'); };
+  const release = () => { el.classList.remove('pressed'); };
+
+  if (holdRepeat) {
+    let holdTimer=null, repInterval=null;
+    const startHold = (e) => {
+      e.preventDefault();
+      act();
+      el.classList.add('pressed');
+      holdTimer = setTimeout(() => {
+        repInterval = setInterval(act, 55);
+      }, 160);
+    };
+    const stopHold = (e) => {
+      if (e) e.preventDefault();
+      clearTimeout(holdTimer); clearInterval(repInterval);
+      el.classList.remove('pressed');
+    };
+    el.addEventListener('touchstart', startHold, {passive:false});
+    el.addEventListener('touchend',   stopHold,  {passive:false});
+    el.addEventListener('touchcancel',stopHold,  {passive:false});
+    el.addEventListener('mousedown', startHold);
+    el.addEventListener('mouseup',   stopHold);
+    el.addEventListener('mouseleave',stopHold);
+  } else {
+    el.addEventListener('touchstart', e => { e.preventDefault(); press(); }, {passive:false});
+    el.addEventListener('touchend',   e => { e.preventDefault(); release(); }, {passive:false});
+    el.addEventListener('mousedown',  press);
+    el.addEventListener('mouseup',    release);
+  }
+}
+
+bindMcBtn('mcRot',  MC_ACTIONS.mcRot);
+bindMcBtn('mcL',    MC_ACTIONS.mcL,    true);
+bindMcBtn('mcR',    MC_ACTIONS.mcR,    true);
+bindMcBtn('mcD',    MC_ACTIONS.mcD);
+bindMcBtn('mcDrop', MC_ACTIONS.mcDrop);
+
+// Init idle draw
+gState='idle'; grid=newGrid(); drawBoard();
+</script>
+</body>
 </html>
